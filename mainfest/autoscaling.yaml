@@ -1,0 +1,63 @@
+# m-queue
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: azure-friday-trigger-auth
+  namespace: scaled-m-queue
+spec:
+  secretTargetRef:
+  - parameter: connection
+    name: azure-friday-secrets-autoscaler
+    key: servicebus-management-connectionstring
+---
+apiVersion: keda.sh/v1alpha1 
+kind: ScaledObject
+metadata:
+  name: azure-friday-orders-scaler-m
+  namespace: scaled-m-queue
+spec:
+  scaleTargetRef:
+    name: scaled-by-service-bus-m
+  cooldownPeriod:  5 # Optional. Default: 300 seconds
+  # Change to define how many minimum replicas you want
+  minReplicaCount: 0
+  maxReplicaCount: 10
+  triggers:
+  - type: azure-servicebus
+    metadata:
+      queueName: mqueue
+      messageCount: '5'
+    authenticationRef:
+      name: azure-friday-trigger-auth
+---
+# l-queue
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: azure-friday-trigger-auth
+  namespace: scaled-l-queue
+spec:
+  secretTargetRef:
+  - parameter: connection
+    name: azure-friday-secrets-autoscaler
+    key: servicebus-management-connectionstring
+---
+apiVersion: keda.sh/v1alpha1 
+kind: ScaledObject
+metadata:
+  name: azure-friday-orders-scaler-l
+  namespace: scaled-l-queue
+spec:
+  scaleTargetRef:
+    name: scaled-by-service-bus-l
+  cooldownPeriod:  5 # Optional. Default: 300 seconds
+  # Change to define how many minimum replicas you want
+  minReplicaCount: 0
+  maxReplicaCount: 10
+  triggers:
+  - type: azure-servicebus
+    metadata:
+      queueName: lqueue
+      messageCount: '5'
+    authenticationRef:
+      name: azure-friday-trigger-auth

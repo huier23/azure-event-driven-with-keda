@@ -1,0 +1,47 @@
+# m-queue
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scaled-by-service-bus-m
+  namespace: scaled-m-queue
+spec:
+  selector:
+    matchLabels:
+      service: scaled-by-service-bus-m
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: scaled-by-service-bus-m
+    spec:
+      containers:
+      - image: mcr.microsoft.com/dotnet/framework/samples:aspnetapp
+        name: aspnetapp
+        imagePullPolicy: Always
+      restartPolicy: Always
+      nodeSelector:
+        agentpool: winm
+---
+# l-queue
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scaled-by-service-bus-l
+  namespace: scaled-l-queue
+spec:
+  selector:
+    matchLabels:
+      service: scaled-by-service-bus-l
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: scaled-by-service-bus-l
+    spec:
+      containers:
+      - image: mcr.microsoft.com/dotnet/framework/samples:aspnetapp
+        name: aspnetapp
+        imagePullPolicy: Always
+      restartPolicy: Always
+      nodeSelector:
+        agentpool: winl
